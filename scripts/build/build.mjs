@@ -88,9 +88,7 @@ const globNativesPlugin = {
                 "mallcordplugins",
                 "userplugins"
             ];
-            let code = "";
-            let natives = "\n";
-            let i = 0;
+            const candidates = new Map();
             /**
              * @type {string[]}
              */
@@ -99,7 +97,7 @@ const globNativesPlugin = {
                 const dirPath = join("src", dir);
                 if (!await exists(dirPath)) continue;
                 const plugins = await readdir(dirPath, { withFileTypes: true });
-                for (const file of plugins) {
+                for (const file of plugins.sort((a, b) => a.name < b.name ? -1 : Number(a.name > b.name))) {
                     const fileName = file.name;
                     const nativePath = join(dirPath, fileName, "native.ts");
                     const indexNativePath = join(dirPath, fileName, "native/index.ts");
@@ -111,13 +109,18 @@ const globNativesPlugin = {
 
                     const pluginName = await resolvePluginName(dirPath, file);
 
-                    const mod = `p${i}`;
-                    code += `import * as ${mod} from "./${dir}/${fileName}/native";\n`;
-                    natives += `${JSON.stringify(pluginName)}:${mod},\n`;
-                    i++;
+                    candidates.set(pluginName, `./${dir}/${fileName}/native`);
                 }
             }
-            code += `export default {${natives}};`;
+
+            let code = "";
+            const natives = [];
+            for (const [name, path] of candidates) {
+                const mod = `p${natives.length}`;
+                code += `import * as ${mod} from ${JSON.stringify(path)};\n`;
+                natives.push(`[${JSON.stringify(name)}]:${mod}`);
+            }
+            code += `export default {${natives.join(",")}};`;
             return {
                 contents: code,
                 resolveDir: "./src",

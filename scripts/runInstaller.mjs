@@ -25,7 +25,9 @@ import { Readable } from "stream";
 import { finished } from "stream/promises";
 import { fileURLToPath } from "url";
 
-const BASE_URL = "https://github.com/MasuRii/OpenCord/releases/latest/download/";
+const REVIVED_REPO = "https://github.com/Zaxoosh/OpenCord-Revived";
+const DOWNLOAD_PATH = "/releases/latest/download/";
+const BOOTSTRAP_REPO = "https://github.com/MasuRii/OpenCord";
 const INSTALLER_PATH_DARWIN = "OpenCordInstaller.app/Contents/MacOS/OpenCordInstaller";
 const INSTALLER_APP_DARWIN = "OpenCordInstaller.app";
 
@@ -71,12 +73,12 @@ async function ensureBinary() {
         ? readFileSync(ETAG_FILE, "utf-8")
         : null;
 
-    const res = await fetch(BASE_URL + filename, {
-        headers: {
-            "User-Agent": "OpenCord (https://github.com/MasuRii/OpenCord)",
-            "If-None-Match": etag
-        }
-    });
+    const headers = { "User-Agent": `OpenCord Revived (${REVIVED_REPO})` };
+    if (etag) headers["If-None-Match"] = etag;
+    let res = await fetch(REVIVED_REPO + DOWNLOAD_PATH + filename, { headers });
+    if (res.status === 404) {
+        res = await fetch(BOOTSTRAP_REPO + DOWNLOAD_PATH + filename, { headers });
+    }
 
     if (res.status === 304) {
         console.log("Up to date, not redownloading!");
@@ -84,8 +86,6 @@ async function ensureBinary() {
     }
     if (!res.ok)
         throw new Error(`Failed to download installer: ${res.status} ${res.statusText}`);
-
-    writeFileSync(ETAG_FILE, res.headers.get("etag"));
 
     if (process.platform === "darwin") {
         console.log("Saving zip...");
@@ -114,6 +114,7 @@ async function ensureBinary() {
         })));
     }
 
+    writeFileSync(ETAG_FILE, res.headers.get("etag") ?? "");
     console.log("Finished downloading!");
 
     return outputFile;
@@ -139,5 +140,6 @@ try {
         }
     });
 } catch {
-    console.error("Something went wrong. Please check the logs above.");
+    console.error("The installer failed. Check the output above.");
+    process.exitCode = 1;
 }

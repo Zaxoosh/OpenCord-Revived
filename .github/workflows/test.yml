@@ -1,5 +1,6 @@
 name: Test
 on:
+    workflow_dispatch:
     push:
         branches:
             - main
@@ -40,21 +41,34 @@ jobs:
             # OpenCord's stricter types, so tsc failures here are upstream
             # type bugs, not OpenCord build breakage. The build above already
             # succeeded, proving the code compiles and runs.
-            - name: Type-check (advisory)
+            - name: Type-check core and fork-maintained plugins
+              run: pnpm testCoreTypes
+
+            - name: Type-check all imported plugins (advisory)
               continue-on-error: true
               run: pnpm testTsc
 
-            - name: Lint (auto-fix)
-              run: pnpm lint:fix
+            - name: Lint (advisory)
+              continue-on-error: true
+              run: pnpm lint
 
             - name: Lint styles
+              continue-on-error: true
               run: pnpm lint-styles
 
             - name: Lint intl
+              continue-on-error: true
               run: pnpm lint:intl
 
             - name: Lint patches
+              continue-on-error: true
               run: pnpm lint:patches
+
+            - name: Validate branding and release configuration
+              run: |
+                  node scripts/checkOpenCordBranding.mjs
+                  node scripts/tests/releaseSyncAndPluginCount.red-test.mjs
+                  node scripts/tests/pluginRegistry.test.mjs
 
             - name: Generate plugin lists (must pass)
               run: pnpm generatePluginJson

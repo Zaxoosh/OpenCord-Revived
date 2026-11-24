@@ -175,9 +175,8 @@ export const globPlugins = kind => ({
                 "userplugins"
             ];
             let code = "";
-            let pluginsCode = "\n";
-            let metaCode = "\n";
-            let excludedCode = "\n";
+            const registrations = [];
+            const excludedPlugins = new Map();
             let i = 0;
             for (const dir of pluginDirs) {
                 const userPlugin = dir === "userplugins";
@@ -185,7 +184,7 @@ export const globPlugins = kind => ({
                 const fullDir = `./src/${dir}`;
                 if (!await exists(fullDir)) continue;
                 const files = await readdir(fullDir, { withFileTypes: true });
-                for (const file of files) {
+                for (const file of files.sort((a, b) => a.name < b.name ? -1 : Number(a.name > b.name))) {
                     const fileName = file.name;
                     if (fileName.startsWith("_") || fileName.startsWith(".")) continue;
                     if (fileName === "index.ts") continue;
@@ -204,7 +203,7 @@ export const globPlugins = kind => ({
 
                         if (excluded) {
                             const name = await resolvePluginName(fullDir, file);
-                            excludedCode += `${JSON.stringify(name)}:${JSON.stringify(target)},\n`;
+                            excludedPlugins.set(name, target);
                             continue;
                         }
                     }
@@ -214,12 +213,15 @@ export const globPlugins = kind => ({
 
                     const mod = `p${i}`;
                     code += `import ${mod} from "./${dir}/${fileName.replace(/\.tsx?$/, "")}";\n`;
-                    pluginsCode += `[${mod}.name]:${mod},\n`;
-                    metaCode += `[${mod}.name]:${JSON.stringify({ folderName, userPlugin, ...providerMeta })},\n`;
+                    registrations.push(`[${mod}.name,[${mod},${JSON.stringify({ folderName, userPlugin, ...providerMeta })}]]`);
                     i++;
                 }
             }
-            code += `export default {${pluginsCode}};export const PluginMeta={${metaCode}};export const ExcludedPlugins={${excludedCode}};`;
+            // Later providers keep precedence, including when a user plugin overrides a bundled one.
+            code += `const selected=new Map([${registrations.join(",\n")}]);\n`;
+            code += "export default Object.fromEntries(Array.from(selected, ([name,[plugin]]) => [name,plugin]));\n";
+            code += "export const PluginMeta=Object.fromEntries(Array.from(selected, ([name,[,meta]]) => [name,meta]));\n";
+            code += `export const ExcludedPlugins=Object.fromEntries(Object.entries(${JSON.stringify(Object.fromEntries(excludedPlugins))}).filter(([name]) => !selected.has(name)));`;
             return {
                 contents: code,
                 resolveDir: "./src",

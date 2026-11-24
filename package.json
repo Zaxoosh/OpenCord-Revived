@@ -1,7 +1,7 @@
 {
     "name": "opencord",
     "private": "true",
-    "version": "1.14.15.23",
+    "version": "1.14.16.0",
     "description": "OpenCord Revived, a Discord desktop client mod",
     "homepage": "https://github.com/Zaxoosh/OpenCord-Revived#readme",
     "bugs": {
@@ -39,7 +39,8 @@
         "lint:patches": "node scripts/lintPatches.mjs",
         "test": "pnpm buildStandalone && pnpm testTsc && pnpm lint:fix && pnpm lint-styles && pnpm lint:intl && pnpm lint:patches && pnpm generatePluginJson",
         "testWeb": "pnpm lint:fix && pnpm buildWeb && pnpm testTsc",
-        "testTsc": "tsc --noEmit"
+        "testTsc": "tsc --noEmit",
+        "testCoreTypes": "node scripts/checkCoreTypes.mjs"
     },
     "dependencies": {
         "@ffmpeg/ffmpeg": "^0.12.10",

@@ -40,12 +40,12 @@ function walkGoFiles(dir) {
 
 // Keep upstream URL remaps as the baseline transformation.
 const urlReplacements = {
-    "https://api.github.com/repos/Equicord/Equicord/releases/latest": "https://api.github.com/repos/MasuRii/OpenCord/releases/latest",
-    "https://equicord.org/releases/equicord": "https://github.com/MasuRii/OpenCord/releases/latest/download/latest.json",
-    "https://api.github.com/repos/Equicord/Equilotl/releases/latest": "https://api.github.com/repos/MasuRii/OpenCord/releases/latest",
-    "https://equicord.org/releases/equilotl": "https://github.com/MasuRii/OpenCord/releases/latest/download/latest.json",
-    "https://github.com/Equicord/Equilotl/releases/latest/download/": "https://github.com/MasuRii/OpenCord/releases/latest/download/",
-    "https://github.com/Equicord/Equilotl": "https://github.com/MasuRii/OpenCord"
+    "https://api.github.com/repos/Equicord/Equicord/releases/latest": "https://api.github.com/repos/Zaxoosh/OpenCord-Revived/releases/latest",
+    "https://equicord.org/releases/equicord": "https://github.com/Zaxoosh/OpenCord-Revived/releases/latest/download/latest.json",
+    "https://api.github.com/repos/Equicord/Equilotl/releases/latest": "https://api.github.com/repos/Zaxoosh/OpenCord-Revived/releases/latest",
+    "https://equicord.org/releases/equilotl": "https://github.com/Zaxoosh/OpenCord-Revived/releases/latest/download/latest.json",
+    "https://github.com/Equicord/Equilotl/releases/latest/download/": "https://github.com/Zaxoosh/OpenCord-Revived/releases/latest/download/",
+    "https://github.com/Equicord/Equilotl": "https://github.com/Zaxoosh/OpenCord-Revived"
 };
 
 const productNameReplacements = {

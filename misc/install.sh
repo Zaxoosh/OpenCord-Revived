@@ -3,14 +3,14 @@
 # Guard against accidental execution on Windows/MSYS/Cygwin
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]] || \
    [[ "$(uname -s)" =~ ^(CYGWIN|MINGW|MSYS|Windows_NT) ]]; then
-    echo "This installer is for Linux. Windows users should download OpenCordInstaller.exe or OpenCordInstallerCli.exe from https://github.com/MasuRii/OpenCord/releases/latest/download/"
+    echo "This installer is for Linux. Windows users should download OpenCordInstaller.exe or OpenCordInstallerCli.exe from https://github.com/Zaxoosh/OpenCord-Revived/releases/latest/download/"
     exit 1
 fi
 
 # Configuration
 INSTALLER_PATH="$HOME/.opencord-installer"
-GITHUB_URL="https://github.com/MasuRii/OpenCord/releases/latest/download/OpenCordCli-linux"
-OPENCORD_ASAR_URL="https://github.com/MasuRii/OpenCord/releases/latest/download/desktop.asar"
+GITHUB_URL="https://github.com/Zaxoosh/OpenCord-Revived/releases/latest/download/OpenCordCli-linux"
+OPENCORD_ASAR_URL="https://github.com/Zaxoosh/OpenCord-Revived/releases/latest/download/desktop.asar"
 OPENCORD_DATA_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/OpenCord"
 OPENCORD_ASAR_PATH="$OPENCORD_DATA_DIR/opencord.asar"
 PRIVILEGE_CMDS=("sudo" "doas")
