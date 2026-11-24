@@ -115,6 +115,7 @@ export type FactoryListernFn = (factory: AnyModuleFactory, moduleId: PropertyKey
 export const waitForSubscriptions = new Map<FilterFn, CallbackFn>();
 export const moduleListeners = new Set<CallbackFn>();
 export const factoryListeners = new Set<FactoryListernFn>();
+export const completedModuleFactories = new WeakSet<object>();
 
 export function _initWebpack(webpackRequire: WebpackRequire) {
     wreq = webpackRequire;
@@ -233,7 +234,7 @@ export const find = traceFunction("find", function find(filter: FilterFn, { isIn
 
     for (const key in cache) {
         const mod = cache[key];
-        if (!mod?.loaded || mod.exports == null) continue;
+        if (mod?.exports == null || !(mod.loaded ?? completedModuleFactories.has(mod))) continue;
 
         if (filter(mod.exports)) {
             return isWaitFor ? [mod.exports, key] : mod.exports;
@@ -263,7 +264,7 @@ export function findAll(filter: FilterFn, { topLevelOnly = false }: { topLevelOn
     const ret = [] as any[];
     for (const key in cache) {
         const mod = cache[key];
-        if (!mod?.loaded || mod.exports == null) continue;
+        if (mod?.exports == null || !(mod.loaded ?? completedModuleFactories.has(mod))) continue;
 
         if (filter(mod.exports))
             ret.push(mod.exports);
@@ -312,7 +313,7 @@ export const findBulk = traceFunction("findBulk", function findBulk(...filterFns
     outer:
     for (const key in cache) {
         const mod = cache[key];
-        if (!mod?.loaded || mod.exports == null) continue;
+        if (mod?.exports == null || !(mod.loaded ?? completedModuleFactories.has(mod))) continue;
 
         for (let j = 0; j < length; j++) {
             const filter = filters[j];
