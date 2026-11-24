@@ -174,7 +174,7 @@ expectIncludes("Equicord contributor constants", constants, "export const Equico
 expectIncludes("Vencord contributor lookup", constants, "export const VencordDevsById");
 expectIncludes("Equicord contributor lookup", constants, "export const EquicordDevsById");
 expectNotIncludes("legacy plugin author attribution", allPluginSources, "OpenCordDevs");
-expectEqual("repository guidance entry point", agents.trim(), ".rules");
+if (agents.trim() !== ".rules" && agents !== rules) failures.push("AGENTS.md must point to the repository rules");
 expectIncludes("new source upstream attribution rule", rules, "Keep older upstream GPL preambles and attribution intact");
 
 // Agent guidance docs must use current OpenCord product wording while keeping

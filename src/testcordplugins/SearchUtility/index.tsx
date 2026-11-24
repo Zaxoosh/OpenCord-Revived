@@ -637,7 +637,6 @@ async function searchChannelMessages(channelId: string, query: QueryOptions) {
 
                 return Array.isArray(response.body) ? response.body : [];
             },
-            cacheable: Array.isArray,
         });
         if (!messages.length) break;
 

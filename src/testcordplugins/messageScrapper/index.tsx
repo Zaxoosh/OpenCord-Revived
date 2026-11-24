@@ -124,7 +124,6 @@ async function fetchAllMessages(channelId: string, throttleMs = 250, onProgress?
 
                 return res?.body ?? [];
             },
-            cacheable: Array.isArray,
         });
 
         if (!batch.length) break;

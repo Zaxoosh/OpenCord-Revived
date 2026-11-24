@@ -241,7 +241,7 @@ export default definePlugin({
         Devs.Arjix,
         Devs.AutumnVN
     ],
-    tags: ["activity"],
+    tags: ["Activity"],
 
     settings,
 

@@ -34,21 +34,19 @@ export function resolveError(isValidResult: boolean | string) {
     return isValidResult ? null : "Invalid input provided";
 }
 
-interface SettingsSectionProps extends PropsWithChildren {
-    name?: string;
-    id: string;
+type SettingsSectionProps = PropsWithChildren<({ name?: string; id: string } | { name: string; id?: string }) & {
     description: string;
     error?: string | null;
     inlineSetting?: boolean;
     tag?: "label" | "div";
-}
+}>;
 
 export function SettingsSection({ tag: Tag = "div", name, id, description, error, inlineSetting, children }: SettingsSectionProps) {
     return (
         <Tag className={cl("section")}>
             <div className={classes(cl("content"), inlineSetting && cl("inline"))}>
                 <div className={cl("label")}>
-                    <BaseText className={cl("title")} size="md" weight="medium">{name ?? wordsToTitle(wordsFromCamel(id))}</BaseText>
+                    <BaseText className={cl("title")} size="md" weight="medium">{name ?? wordsToTitle(wordsFromCamel(id ?? ""))}</BaseText>
                     {description && <BaseText className={cl("description")} size="sm">{description}</BaseText>}
                 </div>
                 {children}

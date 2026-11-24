@@ -102,7 +102,6 @@ async function fetchAllMessages(channelId: string, token: string, onProgress: (n
                 const body = await res.json() as unknown;
                 return Array.isArray(body) ? body : [];
             },
-            cacheable: Array.isArray,
         });
         if (!batch.length) break;
 
