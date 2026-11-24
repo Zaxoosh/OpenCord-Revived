@@ -53,8 +53,8 @@ jobs:
                   go mod download
                   go mod vendor
                   git apply patches/wayland.patch
-                  CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -tags static -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$(git rev-parse --short HEAD)' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCord-x11
-                  CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -tags "cli" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$(git rev-parse --short HEAD)' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordCli-linux
+                  CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -tags static -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$GITHUB_SHA' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCord-x11
+                  CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -tags "cli" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$GITHUB_SHA' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordCli-linux
                   chmod +x OpenCord-x11 OpenCordCli-linux
 
             - name: Upload Linux installer artifacts
@@ -106,8 +106,8 @@ jobs:
                   go mod download
                   go install github.com/tc-hib/go-winres@latest
                   go-winres make --product-version "git-tag"
-                  CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -v -tags "static gui" -ldflags "-s -w -H=windowsgui -extldflags=-static -X 'equilotl/buildinfo.InstallerGitHash=$(git rev-parse --short HEAD)' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordInstaller.exe
-                  CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -v -tags "cli" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$(git rev-parse --short HEAD)' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordInstallerCli.exe
+                  CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -v -tags "static gui" -ldflags "-s -w -H=windowsgui -extldflags=-static -X 'equilotl/buildinfo.InstallerGitHash=$GITHUB_SHA' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordInstaller.exe
+                  CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -v -tags "cli" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$GITHUB_SHA' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordInstallerCli.exe
 
             - name: Test Windows installer lifecycle
               shell: pwsh
@@ -167,8 +167,8 @@ jobs:
               run: |
                   release_tag="v$(node -p "require('../OpenCord/package.json').version")"
                   go mod download
-                  CGO_CFLAGS="-mmacosx-version-min=10.15" CGO_LDFLAGS="-mmacosx-version-min=10.15" CGO_ENABLED=1 GOOS=darwin GOARCH=${{ matrix.arch }} go build -v -tags "static gui" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$(git rev-parse --short HEAD)' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordInstaller
-                  CGO_CFLAGS="-mmacosx-version-min=10.15" CGO_LDFLAGS="-mmacosx-version-min=10.15" CGO_ENABLED=1 GOOS=darwin GOARCH=${{ matrix.arch }} go build -v -tags "cli" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$(git rev-parse --short HEAD)' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o ${{ matrix.cli_name }}
+                  CGO_CFLAGS="-mmacosx-version-min=10.15" CGO_LDFLAGS="-mmacosx-version-min=10.15" CGO_ENABLED=1 GOOS=darwin GOARCH=${{ matrix.arch }} go build -v -tags "static gui" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$GITHUB_SHA' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o OpenCordInstaller
+                  CGO_CFLAGS="-mmacosx-version-min=10.15" CGO_LDFLAGS="-mmacosx-version-min=10.15" CGO_ENABLED=1 GOOS=darwin GOARCH=${{ matrix.arch }} go build -v -tags "cli" -ldflags "-s -w -X 'equilotl/buildinfo.InstallerGitHash=$GITHUB_SHA' -X 'equilotl/buildinfo.InstallerTag=$release_tag'" -o ${{ matrix.cli_name }}
                   mkdir -p OpenCordInstaller.app/Contents/MacOS OpenCordInstaller.app/Contents/Resources
                   cp macos/Info.plist OpenCordInstaller.app/Contents/Info.plist
                   mv OpenCordInstaller OpenCordInstaller.app/Contents/MacOS/OpenCordInstaller
@@ -191,6 +191,8 @@ jobs:
 
         steps:
             - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
 
             - uses: pnpm/action-setup@v6
 
@@ -202,6 +204,9 @@ jobs:
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
+
+            - name: Type-check core and fork-maintained plugins
+              run: pnpm testCoreTypes
 
             - name: Get package.json version
               id: pkg

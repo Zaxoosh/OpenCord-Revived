@@ -65,7 +65,7 @@ src/opencordplugins/         OpenCord plugins
 
 ## Installation
 
-OpenCord Revived is available as a source build. This fork has yet to publish a packaged installer. The development injection command uses the Revived installer when available and falls back to the original OpenCord installer before the first release. Both installers are based on [Equilotl](https://github.com/Equicord/Equilotl). In development mode they point Discord at the locally built Revived archive.
+Packaged installers are listed on the [OpenCord Revived releases page](https://github.com/Zaxoosh/OpenCord-Revived/releases). You can also build from source. For source builds, the injection command uses the Revived installer when available and falls back to the original OpenCord installer before the first release. Both installers are based on [Equilotl](https://github.com/Equicord/Equilotl). In development mode they point Discord at the locally built Revived archive.
 
 ### Dependencies
 
