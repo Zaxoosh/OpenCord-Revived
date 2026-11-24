@@ -2,17 +2,17 @@
     "name": "opencord",
     "private": "true",
     "version": "1.14.15.23",
-    "description": "The other cutest Discord client mod",
-    "homepage": "https://github.com/MasuRii/OpenCord#readme",
+    "description": "OpenCord Revived, a Discord desktop client mod",
+    "homepage": "https://github.com/Zaxoosh/OpenCord-Revived#readme",
     "bugs": {
-        "url": "https://github.com/MasuRii/OpenCord/issues"
+        "url": "https://github.com/Zaxoosh/OpenCord-Revived/issues"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/MasuRii/OpenCord.git"
+        "url": "git+https://github.com/Zaxoosh/OpenCord-Revived.git"
     },
     "license": "GPL-3.0-or-later",
-    "author": "OpenCord",
+    "author": "Zaxoosh",
     "scripts": {
         "build": "node --require=./scripts/suppressExperimentalWarnings.js scripts/build/build.mjs",
         "buildStandalone": "pnpm build --standalone",

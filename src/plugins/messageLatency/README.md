@@ -20,7 +20,7 @@ Displays an indicator for messages that took ≥n seconds to send.
 
 ### Clock +ve Drift
 
-![dumb-ai](https://github.com/Vendicated/Vencord/assets/82430093/0e9783cf-51d5-4559-ae10-42399e7d4099)
+![Message latency example](https://github.com/Vendicated/Vencord/assets/82430093/0e9783cf-51d5-4559-ae10-42399e7d4099)
 
 ### Connection Delay
 

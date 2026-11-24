@@ -100,7 +100,7 @@ function hasReleaseLink(fileContents, assetName) {
 // ---------------------------------------------------------------------------
 
 check("README tagline calls plugin folders 'source folders'", () => {
-    const taglineMatch = readme.match(/focused on a massive cross-community plugin catalog with \d+ plugin[^.]*\./);
+    const taglineMatch = readme.match(/The repository has \d+ plugin source folders\./);
     if (!taglineMatch) {
         return fail("could not locate tagline plugin-count sentence");
     }
@@ -129,79 +129,20 @@ check("README feature table calls plugin folders 'source folders'", () => {
 // Release asset naming in README
 // ---------------------------------------------------------------------------
 
-check("README Windows GUI installer link is OpenCord-branded", () => {
-    if (/Equilotl\.exe/i.test(readme)) {
-        return fail("README still links to legacy Equilotl.exe installer");
+check("README documents how to build and inject the fork from source", () => {
+    const installSection = readme.split("## Installation")[1]?.split("\n## ")[0] ?? "";
+    for (const expected of [
+        "https://github.com/Zaxoosh/OpenCord-Revived.git",
+        "pnpm build --disable-updater",
+        "pnpm inject",
+        "pnpm uninject",
+        "https://github.com/Equicord/Equilotl",
+    ]) {
+        if (!installSection.includes(expected)) return fail(`README installation is missing ${expected}`);
     }
-    if (!readme.includes(`releases/latest/download/${opencordInstallerAssets.windowsGui}`)) {
-        return fail(`README does not link to ${opencordInstallerAssets.windowsGui}`);
+    if (installSection.includes("https://github.com/MasuRii/OpenCord/releases/")) {
+        return fail("README directs installers to upstream release downloads");
     }
-    return pass();
-});
-
-check("README Windows CLI installer link is OpenCord-branded", () => {
-    if (/EquilotlCli\.exe/i.test(readme)) {
-        return fail("README still links to legacy EquilotlCli.exe installer");
-    }
-    if (!readme.includes(`releases/latest/download/${opencordInstallerAssets.windowsCli}`)) {
-        return fail(`README does not link to ${opencordInstallerAssets.windowsCli}`);
-    }
-    return pass();
-});
-
-check("README macOS x64 installer link is OpenCord-branded", () => {
-    if (/Equilotl-darwin-x64\.zip/i.test(readme)) {
-        return fail("README still links to legacy Equilotl-darwin-x64.zip installer");
-    }
-    if (!readme.includes(`releases/latest/download/${opencordInstallerAssets.darwinX64Zip}`)) {
-        return fail(`README does not link to ${opencordInstallerAssets.darwinX64Zip}`);
-    }
-    return pass();
-});
-
-check("README macOS arm64 installer link is OpenCord-branded", () => {
-    if (/Equilotl-darwin-arm64\.zip/i.test(readme)) {
-        return fail("README still links to legacy Equilotl-darwin-arm64.zip installer");
-    }
-    if (!readme.includes(`releases/latest/download/${opencordInstallerAssets.darwinArm64Zip}`)) {
-        return fail(`README does not link to ${opencordInstallerAssets.darwinArm64Zip}`);
-    }
-    return pass();
-});
-
-check("README Linux GUI installer link is OpenCord-branded", () => {
-    if (/Equilotl-x11/i.test(readme)) {
-        return fail("README still links to legacy Equilotl-x11 installer");
-    }
-    if (!readme.includes(`releases/latest/download/${opencordInstallerAssets.linuxGui}`)) {
-        return fail(`README does not link to ${opencordInstallerAssets.linuxGui}`);
-    }
-    return pass();
-});
-
-check("README Linux CLI installer link is OpenCord-branded", () => {
-    if (/EquilotlCli-linux/i.test(readme)) {
-        return fail("README still links to legacy EquilotlCli-linux installer");
-    }
-    if (!readme.includes(`releases/latest/download/${opencordInstallerAssets.linuxCli}`)) {
-        return fail(`README does not link to ${opencordInstallerAssets.linuxCli}`);
-    }
-    return pass();
-});
-
-// ---------------------------------------------------------------------------
-// Equilotl credit retention
-// ---------------------------------------------------------------------------
-
-check("README retains Equilotl installer credit", () => {
-    const installSection = readme.split("## Installing / Uninstalling")[1]?.split("\n## ")[0] ?? "";
-    const creditNote = installSection.match(/Equilotl/i);
-    const creditWording = installSection.match(/desktop installer backend/i);
-
-    if (!creditNote || !creditWording) {
-        return fail("README installer section must keep a credit note acknowledging Equilotl as the desktop installer backend");
-    }
-
     return pass();
 });
 

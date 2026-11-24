@@ -18,12 +18,8 @@ const aboutAcknowledgements = about.split("<h2>Acknowledgements</h2>")[1]?.split
 const supportHelper = readFileSync(join(root, "src", "plugins", "_core", "supportHelper.tsx"), "utf8");
 const trustedRolesBlock = supportHelper.split("const TrustedRolesIds = [")[1]?.split("];", 1)[0] ?? "";
 const discordDevBannerConsts = readFileSync(join(root, "src", "equicordplugins", "discordDevBanner", "components", "consts.ts"), "utf8");
-const agentGuidanceFiles = ["AGENTS.md", "CLAUDE.md", "GEMINI.md"];
-const agentGuidanceDocs = Object.fromEntries(agentGuidanceFiles.map(relativePath => [
-    relativePath,
-    readFileSync(join(root, relativePath), "utf8"),
-]));
-const agents = agentGuidanceDocs["AGENTS.md"];
+const rules = readFileSync(join(root, ".rules"), "utf8");
+const agents = readFileSync(join(root, "AGENTS.md"), "utf8");
 const constants = readFileSync(join(root, "src", "utils", "constants.ts"), "utf8");
 const vencordPluginRoot = join(root, "src", "plugins");
 const equicordPluginRoot = join(root, "src", "equicordplugins");
@@ -89,15 +85,11 @@ function expectFileIncludes(relativePath, label, expected) {
 }
 
 function expectAgentGuidanceIncludes(label, expected) {
-    for (const [relativePath, contents] of Object.entries(agentGuidanceDocs)) {
-        expectIncludes(`${relativePath} ${label}`, contents, expected);
-    }
+    expectIncludes(`.rules ${label}`, rules, expected);
 }
 
 function expectAgentGuidanceNotIncludes(label, unexpected) {
-    for (const [relativePath, contents] of Object.entries(agentGuidanceDocs)) {
-        expectNotIncludes(`${relativePath} ${label}`, contents, unexpected);
-    }
+    expectNotIncludes(`.rules ${label}`, rules, unexpected);
 }
 
 function expectSvgSymbolSplit(label, relativePath, expectedClass, unexpectedClass) {
@@ -150,14 +142,14 @@ function readSourceTree(path) {
 }
 
 expectEqual("package.json name", packageJson.name, "opencord");
-expectEqual("package.json author", packageJson.author, "OpenCord");
-expectEqual("package.json homepage", packageJson.homepage, "https://github.com/OpenCord/OpenCord#readme");
-expectEqual("package.json bugs.url", packageJson.bugs?.url, "https://github.com/OpenCord/OpenCord/issues");
-expectEqual("package.json repository.url", packageJson.repository?.url, "git+https://github.com/OpenCord/OpenCord.git");
-expectIncludes("README primary heading", readme, "# [](https://github.com/OpenCord/OpenCord) OpenCord");
-expectIncludes("README product description", readme, "OpenCord is a fork of [Vencord](https://github.com/Vendicated/Vencord)");
+expectEqual("package.json author", packageJson.author, "Zaxoosh");
+expectEqual("package.json homepage", packageJson.homepage, "https://github.com/Zaxoosh/OpenCord-Revived#readme");
+expectEqual("package.json bugs.url", packageJson.bugs?.url, "https://github.com/Zaxoosh/OpenCord-Revived/issues");
+expectEqual("package.json repository.url", packageJson.repository?.url, "git+https://github.com/Zaxoosh/OpenCord-Revived.git");
+expectIncludes("README primary heading", readme, "# OpenCord Revived");
+expectIncludes("README product description", readme, "OpenCord Revived is a continuation of [MasuRii’s OpenCord]");
 expectIncludes("README credits Equicord upstream acknowledgement", readmeCredits, "[Equicord](https://github.com/Equicord/Equicord)");
-expectIncludes("README disclaimer dual upstream credit", readmeDisclaimer, "Vencord and Equicord are not connected to OpenCord");
+expectIncludes("README disclaimer dual upstream credit", readmeDisclaimer, "OpenCord Revived is maintained independently of OpenCord, Equicord, and Vencord");
 expectIncludes("about acknowledgements Equicord upstream project", aboutAcknowledgements, "<a href=\"https://github.com/Equicord/Equicord\" target=\"_blank\">Equicord</a>");
 expectIncludes("about Suncord historical Equicord merge wording", aboutAcknowledgements, "merged into Equicord");
 expectIncludes("supportHelper OpenCord team Discord role provenance", trustedRolesBlock, "OPENCORD_TEAM, // Equicord Team (Discord role)");
@@ -182,17 +174,13 @@ expectIncludes("Equicord contributor constants", constants, "export const Equico
 expectIncludes("Vencord contributor lookup", constants, "export const VencordDevsById");
 expectIncludes("Equicord contributor lookup", constants, "export const EquicordDevsById");
 expectNotIncludes("legacy plugin author attribution", allPluginSources, "OpenCordDevs");
-expectIncludes("new source Vencord header rule", agents, "* Vencord, a Discord client mod");
-expectIncludes("new source Vendicated copyright rule", agents, "Vendicated and contributors");
-expectIncludes("new source SPDX rule", agents, "SPDX-License-Identifier: GPL-3.0-or-later");
-expectIncludes("new source upstream attribution rule", agents, "upstream attribution is kept across the whole tree");
+expectEqual("repository guidance entry point", agents.trim(), ".rules");
+expectIncludes("new source upstream attribution rule", rules, "Keep older upstream GPL preambles and attribution intact");
 
 // Agent guidance docs must use current OpenCord product wording while keeping
 // Vencord SPDX attribution and real Equicord contributor identifiers intact.
 expectAgentGuidanceIncludes("OpenCord heading", "# OpenCord Rules");
-expectAgentGuidanceIncludes("OpenCord-only SPDX guidance", "even on new OpenCord-only files");
-expectAgentGuidanceIncludes("OpenCord fork attribution", "OpenCord is a Vencord fork");
-expectAgentGuidanceIncludes("preserved SPDX naming warning", "Don't change it to \"OpenCord\" or \"Equicord\".");
+expectAgentGuidanceIncludes("OpenCord-only SPDX guidance", "OpenCord, a Discord client mod");
 expectAgentGuidanceIncludes("OpenCord plugin path option", "`src/opencordplugins/<name>/index.tsx`");
 expectAgentGuidanceIncludes("OpenCord modified plugin wording", "`isModified?: true` marks an upstream Vencord plugin OpenCord modified.");
 expectAgentGuidanceIncludes("OpenCord bundle wording", "They only exist in OpenCord's bundle.");
