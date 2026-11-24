@@ -52,6 +52,9 @@ const productNameReplacements = {
     // Installer asset names.
     "Equilotl.exe": "OpenCordInstaller.exe",
     "EquilotlCli.exe": "OpenCordInstallerCli.exe",
+    '"EquilotlCli"': '"OpenCordInstallerCli"',
+    "Equilotl-x64.dmg": "OpenCord-darwin-x64.zip",
+    "Equilotl-arm64.dmg": "OpenCord-darwin-arm64.zip",
     "Equilotl-x11": "OpenCord-x11",
     "EquilotlCli-linux": "OpenCordCli-linux",
     "Equilotl-darwin-x64.zip": "OpenCord-darwin-x64.zip",
