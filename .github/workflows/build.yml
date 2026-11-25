@@ -1,6 +1,11 @@
 name: Release
 on:
     workflow_dispatch:
+        inputs:
+            include_apple_silicon:
+                description: Include the Apple Silicon installer build
+                type: boolean
+                default: false
     push:
         tags:
             - 'v*'
@@ -127,15 +132,7 @@ jobs:
         if: github.ref_type == 'tag' || github.actor != 'github-actions[bot]'
         strategy:
             matrix:
-                include:
-                    - arch: amd64
-                      runner: macos-15-intel
-                      gui_name: OpenCord-darwin-x64.zip
-                      cli_name: OpenCordCli-darwin-x64
-                    - arch: arm64
-                      runner: macos-latest
-                      gui_name: OpenCord-darwin-arm64.zip
-                      cli_name: OpenCordCli-darwin-arm64
+                include: ${{ fromJSON(inputs.include_apple_silicon && '[{"arch":"amd64","runner":"macos-15-intel","gui_name":"OpenCord-darwin-x64.zip","cli_name":"OpenCordCli-darwin-x64"},{"arch":"arm64","runner":"macos-15","gui_name":"OpenCord-darwin-arm64.zip","cli_name":"OpenCordCli-darwin-arm64"}]' || '[{"arch":"amd64","runner":"macos-15-intel","gui_name":"OpenCord-darwin-x64.zip","cli_name":"OpenCordCli-darwin-x64"}]') }}
 
         steps:
             - name: Checkout Equilotl
@@ -297,26 +294,21 @@ jobs:
             - name: Generate release notes
               run: node scripts/generateReleaseNotes.mjs > dist/release-notes.md
 
-            - name: Publish GitHub release
+            - name: Stage GitHub release
               if: steps.check.outputs.release == 'true'
               env:
                   GH_TOKEN: ${{ github.token }}
               run: |
                   VERSION="${{ steps.pkg.outputs.version }}"
 
-                  LATEST_FLAG=""
-                  if [ "${{ steps.is_latest.outputs.is_latest }}" = "true" ]; then
-                      LATEST_FLAG="--latest"
-                  fi
-
                   git fetch --tags origin
 
                   RELEASE_TITLE="OpenCord Revived $VERSION $(git rev-parse HEAD)"
 
                   if gh release view "$VERSION" >/dev/null 2>&1; then
-                      gh release edit "$VERSION" --title "$RELEASE_TITLE" --notes-file dist/release-notes.md $LATEST_FLAG
+                      gh release edit "$VERSION" --title "$RELEASE_TITLE" --notes-file dist/release-notes.md
                   else
-                      gh release create "$VERSION" --title "$RELEASE_TITLE" --notes-file dist/release-notes.md $LATEST_FLAG
+                      gh release create "$VERSION" --verify-tag --draft --title "$RELEASE_TITLE" --notes-file dist/release-notes.md
                   fi
 
                   gh release upload "$VERSION" --clobber dist/release/*
@@ -327,7 +319,10 @@ jobs:
                   GH_TOKEN: ${{ github.token }}
               run: |
                   VERSION="${{ steps.pkg.outputs.version }}"
-                  gh api "repos/${{ github.repository }}/releases/tags/${VERSION}" > dist/release/latest.json
+                  gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --paginate --slurp \
+                    | jq -e --arg version "$VERSION" --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/$VERSION" \
+                      'map(.[]) | map(select(.tag_name == $version)) | first | select(. != null) | .draft = false | .assets |= map(.browser_download_url = ($url + "/" + .name))' \
+                    > dist/release/latest.json
 
             - name: Upload latest.json installer fallback
               if: steps.check.outputs.release == 'true'
@@ -336,6 +331,18 @@ jobs:
               run: |
                   VERSION="${{ steps.pkg.outputs.version }}"
                   gh release upload "$VERSION" --clobber dist/release/latest.json
+
+            - name: Publish verified assets
+              if: steps.check.outputs.release == 'true'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: |
+                  VERSION="${{ steps.pkg.outputs.version }}"
+                  if [ "${{ steps.is_latest.outputs.is_latest }}" = "true" ]; then
+                      gh release edit "$VERSION" --draft=false --latest
+                  else
+                      gh release edit "$VERSION" --draft=false --latest=false
+                  fi
 
             - name: Upload Plugin JSONs to Equibored repo
               if: github.repository == 'Equicord/Equicord' && vars.ACT == 'false'

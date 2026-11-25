@@ -1,7 +1,7 @@
 {
     "name": "opencord",
     "private": "true",
-    "version": "1.14.16.0",
+    "version": "1.14.16.1",
     "description": "OpenCord Revived, a Discord desktop client mod",
     "homepage": "https://github.com/Zaxoosh/OpenCord-Revived#readme",
     "bugs": {
